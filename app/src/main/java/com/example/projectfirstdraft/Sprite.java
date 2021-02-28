@@ -86,7 +86,7 @@ public class Sprite
         if(y> screenHeight && dy>0)
             y=0;
         if(x < 0)
-        {
+        {//
             if (!airborne)
                 dx = 30;
             else
