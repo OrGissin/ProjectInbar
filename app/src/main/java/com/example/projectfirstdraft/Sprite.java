@@ -21,7 +21,7 @@ public class Sprite
     private boolean airborne;
     private String whereWall;
     private boolean dJump;
-
+    private boolean onBox;
     public Sprite(Bitmap bitmap, int screenWidth, int screenHeight)
     {
         image = bitmap;
@@ -29,15 +29,18 @@ public class Sprite
         currentImage = image;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
-        dx = 20;
+        dx = 30;
         dy = 0;
         x = 0;
         y = screenHeight/2;
         airborne = true;
         dJump = true;
+        onBox = false;
         whereWall = "right";
         rect = new Rect(x,y,x+currentImage.getWidth(),y+currentImage.getHeight());
     }
+
+    public Bitmap getCurrentImage() {return currentImage;}
     public void setCurrentImage(Bitmap bitmap)
     {currentImage = Bitmap.createScaledBitmap(bitmap,150,200,false);}
     public void draw(Canvas canvas) {canvas.drawBitmap(currentImage,x,y,null);}
@@ -45,10 +48,23 @@ public class Sprite
     public int getX() {return x;}
     public int getDy() {return dy;}
     public void setAirborne(boolean b) {airborne=b;}
+    public void setOnBox(boolean onBox) {this.onBox = onBox;}
     public void move(Box box1, Box box2)
     {
         if (!airborne)
+        {
             dJump = true;
+            if (!onBox)
+            switch (whereWall)
+            {
+                case "right":
+                    dx = -30;
+                    break;
+                case "left":
+                    dx = 30;
+                    break;
+            }
+        }
         x += dx;
         if (airborne)
             dy += 3;
@@ -56,25 +72,17 @@ public class Sprite
             dy = 0;
         y += dy;
 
-        if (intersects(this.rect, box1.getRect()))
+        if ((intersects(this.rect, box1.getRect()) || intersects(this.rect, box2.getRect())) && airborne && !onBox)
         {
-            if ((box1.getRect().top - this.rect.bottom ) < 3) airborne = false;
-            else if (Math.abs(this.rect.top - box1.getRect().bottom) < 3) dy = 0;
-            else if (this.rect.left < box1.getRect().left) {dx = 0; whereWall = "right";}
-            else if (this.rect.right > box1.getRect().right) {dx = 0; whereWall = "left";}
-        }
-        if (intersects(this.rect, box2.getRect()))
-        {
-            if (Math.abs(box2.getRect().top - this.rect.bottom ) < 3) airborne = false;
-            else if (Math.abs(this.rect.top - box2.getRect().bottom) < 3) dy = 0;
-            else if (this.rect.left < box1.getRect().left) {dx = 0; whereWall = "right";}
-            else if (this.rect.right > box1.getRect().right) {dx = 0; whereWall = "left";}
+            if (Math.abs(this.rect.top - box1.getRect().bottom) < 15) {y = box1.getRect().bottom; dy = 12;}
+            else if (this.rect.left < box1.getRect().left) {x += dx*-1; dx = 0; whereWall = "right";}
+            else if (this.rect.right > box1.getRect().right) {x += dx*-1; dx = 0; whereWall = "left";}
         }
 
         if(x > 950)
         {
             if (!airborne)
-                dx = -30;
+                dx *= -1;
             else
             {
                 dx = 0;
@@ -86,9 +94,9 @@ public class Sprite
         if(y> screenHeight && dy>0)
             y=0;
         if(x < 0)
-        {//
+        {
             if (!airborne)
-                dx = 30;
+                dx *= -1;
             else
             {
                 dx = 0;
@@ -111,7 +119,7 @@ public class Sprite
     {
         if (!dJump && airborne)
             return;
-        dy -= 40;
+        dy = -40;
         if (airborne)
             dJump = false;
         airborne = true;
@@ -124,6 +132,7 @@ public class Sprite
                     dx = 30;
                     break;
             }
+            dJump = true;
         }
     }
     public Rect getRect(){return rect;}

@@ -46,7 +46,7 @@ public class CharView extends SurfaceView implements Runnable
         bg2 = new Background(bitmap3,width, height);
         box = new Box(bitmap4, width, height);
         box2 = new Box(bitmap4, width, height);
-        box2.setX(box.getX()*2);
+        box2.setX(box.getX()/2 - 100);
         isRunning = true;
         platform = new Platform(bitmap2,width,height);
         thread = new Thread(this);
@@ -74,10 +74,18 @@ public class CharView extends SurfaceView implements Runnable
         while (isRunning)
         {
             drawSurface();
-            if (checkTouch(sprite.getRect(),platform.getRect(),sprite.getDy()))
+            if ((checkTouch(sprite.getRect(), platform.getRect(), sprite.getDy())))
                 sprite.setAirborne(false);
+            else if ((checkTouch(sprite.getRect(), box.getRect(), sprite.getDy())) || (checkTouch(sprite.getRect(), box2.getRect(), sprite.getDy())))
+            {
+                sprite.setOnBox(true);
+                sprite.setAirborne(false);
+            }
             else
+            {
                 sprite.setAirborne(true);
+                sprite.setOnBox(false);
+            }
             sprite.move(box, box2);
             bg1.update();
             bg2.update();
@@ -101,5 +109,5 @@ public class CharView extends SurfaceView implements Runnable
         return isRunning;
     }
     public boolean checkTouch(Rect rect1, Rect rect2, int dy)
-    {return (intersects(rect1,rect2) && rect1.bottom < rect2.bottom && dy >= 0);}
+    {return (intersects(rect1,rect2) && (Math.abs(rect2.top - rect1.bottom) < 30) && dy >= 0);}
 }
