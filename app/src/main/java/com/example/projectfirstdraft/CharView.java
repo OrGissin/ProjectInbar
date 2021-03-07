@@ -3,16 +3,12 @@
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.os.Bundle;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Handler;
-import android.os.Message;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import java.util.ArrayList;
 
 import static android.graphics.Rect.intersects;
 
@@ -75,15 +71,15 @@ public class CharView extends SurfaceView implements Runnable
         {
             drawSurface();
             if ((checkTouch(sprite.getRect(), platform.getRect(), sprite.getDy())))
-                sprite.setAirborne(false);
+                sprite.setInTheAir(false);
             else if ((checkTouch(sprite.getRect(), box.getRect(), sprite.getDy())) || (checkTouch(sprite.getRect(), box2.getRect(), sprite.getDy())))
             {
                 sprite.setOnBox(true);
-                sprite.setAirborne(false);
+                sprite.setInTheAir(false);
             }
             else
             {
-                sprite.setAirborne(true);
+                sprite.setInTheAir(true);
                 sprite.setOnBox(false);
             }
             sprite.move(box, box2);
@@ -109,5 +105,5 @@ public class CharView extends SurfaceView implements Runnable
         return isRunning;
     }
     public boolean checkTouch(Rect rect1, Rect rect2, int dy)
-    {return (intersects(rect1,rect2) && (Math.abs(rect2.top - rect1.bottom) < 30) && dy >= 0);}
+    {return (intersects(rect1,rect2) && (Math.abs(rect2.top - rect1.bottom) < 42) && dy >= 0);}
 }
